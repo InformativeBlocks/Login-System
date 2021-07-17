@@ -1,6 +1,6 @@
 #############################################################################
 ##  Using PysimpleGUI Module
-##  Created By - Neel Mani Upadhyay
+##  Created By - Informative Blocks
 ##  WARNING! All changes made in this file will be lost!
 #############################################################################
 
@@ -10,31 +10,37 @@
 import PySimpleGUI as sg
 import json, os, sys, smtplib, ssl, random
 
-# ----------- Creating All Required Windows -----------------
-# ---------------- Front-End-Process ----------------
 
+# ----------- Creating All Required Windows -----------------
+
+# ---------------- Front-End-Functions ----------------
+
+# Login Interface
 def win_Login():
     try:
-        #-------------------------------------------------------------------
-        Left_Column = [[sg.Text('Or Are you New User?'), sg.Text(' '*10)],
+        # Interface Layout
+        # -------------------------------------------------------------------
+        Left_Column = [[sg.Text('Or Are you New User?'), sg.Text(' ' * 10)],
                        [sg.Text('Then'), sg.Button(' Sign Up ')]]
-        
-        Right_Column = [[sg.Text(' '*13), sg.Button(' Forget Email? ')],
-                        [sg.Text(' '*13), sg.Button(' Forget Password? ')]]
-        
-        layout = [[sg.Text('Email : '), sg.InputText(key = 'in1', do_not_clear = False)],
-                  [sg.Text('Password : '), sg.InputText(key = 'in2', do_not_clear = False, password_char = '*')],
+
+        Right_Column = [[sg.Text(' ' * 13), sg.Button(' Forget Email? ')],
+                        [sg.Text(' ' * 13), sg.Button(' Forget Password? ')]]
+
+        layout = [[sg.Text('Email : '), sg.InputText(key='in1', do_not_clear=False)],
+                  [sg.Text('Password : '), sg.InputText(key='in2', do_not_clear=False, password_char='*')],
                   [sg.Button(' Log In ')],
-                  [sg.Text('_'*60)],
+                  [sg.Text('_' * 60)],
                   [sg.Column(Left_Column), sg.VSeperator(), sg.Column(Right_Column)]]
-        
-        window = sg.Window('Login', layout, margins = (20,40))
-        #-------------------------------------------------------------------
-        
+
+        window = sg.Window('Login', layout, margins=(20, 40))
+        # -------------------------------------------------------------------
+
+        # Defining Button Connections and Acceptable Data Logic
+        # -------------------------------------------------------------------
         event, values = window.Read()
         if (event == ' Log In '):
             email = str(values['in1'])
-            
+
             Is_space = email.isspace()
             if not email:
                 sg.Popup('No Input Data!!')
@@ -105,19 +111,23 @@ def win_Login():
         win_Invalid_Input()
         window.close()
         win_Login()
-        
-        
+
+
+# Signup Interface
 def win_Signup():
     try:
-        #----------------------------------------------------------------
-        layout = [[sg.Text('Enter Email : '), sg.InputText(key = 'in1', do_not_clear = False)],
-                  [sg.Text('Create Password : '), sg.InputText(key = 'in2', password_char = '*', do_not_clear = False)],
-                  [sg.Text('ReEnter Password : '), sg.InputText(key = 'in3', password_char = '*', do_not_clear = False)],
+        # Interface Layout
+        # -------------------------------------------------------------------
+        layout = [[sg.Text('Enter Email : '), sg.InputText(key='in1', do_not_clear=False)],
+                  [sg.Text('Create Password : '), sg.InputText(key='in2', password_char='*', do_not_clear=False)],
+                  [sg.Text('ReEnter Password : '), sg.InputText(key='in3', password_char='*', do_not_clear=False)],
                   [sg.Button(' Sign Up ')]]
-        
-        window = sg.Window('Sign Up', layout, margins = (30,50))
-        #----------------------------------------------------------------
-        
+
+        window = sg.Window('Sign Up', layout, margins=(30, 50))
+        # -------------------------------------------------------------------
+
+        # Backend Logic
+        # -------------------------------------------------------------------
         event, values = window.Read()
         if (event == ' Sign Up '):
             global email
@@ -145,7 +155,7 @@ def win_Signup():
                 global passd
                 passd = pass_encoder(passwd)
                 window.close()
-                last_step(True,email,passd)
+                last_step(True, email, passd)
             else:
                 win_Error()
                 window.close()
@@ -160,33 +170,36 @@ def win_Signup():
     except Exception as err:
         window.close()
 
-    
-    
-def win_Verify(code,get_email):
+
+# Verify Window Interface
+def win_Verify(code, get_email):
     try:
-        #-----------------------------------------------------------------
+        # Interface Layout
+        # -------------------------------------------------------------------
         layout = [[sg.Text('OTP sent to your registered Email ID...')],
-                  [sg.Text('Enter OTP : '), sg.InputText(key = 'in1')],
+                  [sg.Text('Enter OTP : '), sg.InputText(key='in1')],
                   [sg.Button(' Verify ')],
                   [sg.Text("Didn't recieved OTP?"), sg.Button(' Resend OTP ')]]
-        
-        window = sg.Window('Verifying', layout, margins = (20,30))
-        #------------------------------------------------------------------
-        
+
+        window = sg.Window('Verifying', layout, margins=(20, 30))
+        # -------------------------------------------------------------------
+
+        # Backend Logic
+        # -------------------------------------------------------------------
         event, values = window.Read()
         if (event == ' Verify '):
             in_otp = str(values['in1'])
             if (in_otp.isspace() == True):
                 sg.Popup('Otp cannot contain space!!')
                 window.close()
-                win_Verify(code,get_email)
+                win_Verify(code, get_email)
             else:
                 in_otp = int(values['in1'])
                 pass
             if not in_otp:
                 sg.Popup('Please Enter OTP!!')
                 window.close()
-                win_Verify(code,get_email)
+                win_Verify(code, get_email)
             elif (in_otp == code):
                 window.close()
                 win_resetpass()
@@ -195,7 +208,7 @@ def win_Verify(code,get_email):
                 window.close()
                 win_Login()
         elif (event == ' Resend OTP '):
-            send_otp(code,get_email)
+            send_otp(code, get_email)
             window.close()
             win_Verify(code, get_email)
         elif (event == sg.WIN_CLOSED):
@@ -208,32 +221,38 @@ def win_Verify(code,get_email):
         win_Verify()
 
 
+# Security Setup Interface
 def sec_ques_setup():
+    # List of Security Questions
+    # -----------------------------------------------------------------------
     q1 = 'What was the name of your Elementry/Primary School?'
     q2 = 'What is your Favorite place in India?'
     q3 = 'In What City were you born?'
     q4 = 'What is the name of your First Grade Teacher?'
     q5 = 'What is the first name of your Best Friend?'
-    
-    List = [q1,q2,q3,q4,q5]
-    
-    #---------------------------------------------------------------------
+
+    List = [q1, q2, q3, q4, q5]
+
+    # Interface Layout
+    # -----------------------------------------------------------------------
     layout = [[sg.Text('Just One More Step!!\n')],
               [sg.Text('Please choose any Security Question and write it Answer..\n')],
-              [sg.Text('First Question : '), sg.OptionMenu(List, key = 'sq1')],
-              [sg.Text('Enter Answer : '), sg.InputText(key = 'in1')],
-              [sg.Text('Second Question : '), sg.OptionMenu(List, key = 'sq2')],
-              [sg.Text('Enter Answer : '), sg.InputText(key = 'in2')],
-              [sg.Text('Third Question : '), sg.OptionMenu(List, key = 'sq3')],
-              [sg.Text('Enter Answer : '), sg.InputText(key = 'in3')],
+              [sg.Text('First Question : '), sg.OptionMenu(List, key='sq1')],
+              [sg.Text('Enter Answer : '), sg.InputText(key='in1')],
+              [sg.Text('Second Question : '), sg.OptionMenu(List, key='sq2')],
+              [sg.Text('Enter Answer : '), sg.InputText(key='in2')],
+              [sg.Text('Third Question : '), sg.OptionMenu(List, key='sq3')],
+              [sg.Text('Enter Answer : '), sg.InputText(key='in3')],
               [sg.Button(' Submit ')]]
-    
+
     window = sg.Window('Security Setup', layout)
-    #----------------------------------------------------------------------
-    
+    # -----------------------------------------------------------------------
+
+    # Backend Logic
+    # -----------------------------------------------------------------------
     event, values = window.Read()
     if (event == ' Submit '):
-        if (values['sq1'] != values['sq2']):   # you don't select same questions 
+        if (values['sq1'] != values['sq2']):  # you don't select same questions
             if (values['sq2'] != values['sq3']):
                 if (values['sq1'] != values['sq3']):
                     if (not values['in1']) or (not values['in2']) or (not values['in3']):
@@ -243,7 +262,8 @@ def sec_ques_setup():
                     elif ((values['in1'].isspace()) == False):
                         if ((values['in2'].isspace()) == False):
                             if ((values['in3'].isspace()) == False):
-                                sq = {values['sq1']:values['in1'],values['sq2']:values['in2'],values['sq3']:values['in3']}
+                                sq = {values['sq1']: values['in1'], values['sq2']: values['in2'],
+                                      values['sq3']: values['in3']}
                                 window.close()
                                 return sq
                             else:
@@ -276,10 +296,12 @@ def sec_ques_setup():
         win_setup_Incomplete()
     else:
         sec_ques_setup()
-        
 
+
+# If you close the program accidentally while setup Process then next time it will start from where you left
 def win_setup_Incomplete():
-    #---------------------------------------------------------------------------
+    # Interface Layout
+    # -----------------------------------------------------------------------
     layout = [[sg.Text("You don't Proceed Next... If you want to setup later..")],
               [sg.Text('Then'), sg.Button(' Close ')],
               [sg.Text('')],
@@ -287,31 +309,37 @@ def win_setup_Incomplete():
               [sg.Text('Then'), sg.Button(' Continue ')]]
 
     window = sg.Window('Setup InComplete', layout)
-    #---------------------------------------------------------------------------
+    # -----------------------------------------------------------------------
 
+    # Backend Logic
+    # -----------------------------------------------------------------------
     event, values = window.Read()
     if (event == ' Close ' or event == sg.WIN_CLOSED):
         window.close()
-        last_step(False,email,passd)
+        last_step(False, email, passd)
     elif (event == ' Continue '):
         window.close()
         sq = sec_ques_setup()
-        last_step(True,email,passd,sq)
+        last_step(True, email, passd, sq)
     else:
         window.close()
         win_setup_Incomplete()
-    
 
+
+# Password Reset Interface
 def win_resetpass():
-    #--------------------------------------------------------------------
+    # Interface Layout
+    # --------------------------------------------------------------------
     layout = [[sg.Text('Please Enter your New Password...')],
-              [sg.Text('New Password : '), sg.InputText(key = 'in1', password_char = '*')],
-              [sg.Text('Confirm Password : '), sg.InputText(key = 'in2', password_char = '*')],
+              [sg.Text('New Password : '), sg.InputText(key='in1', password_char='*')],
+              [sg.Text('Confirm Password : '), sg.InputText(key='in2', password_char='*')],
               [sg.Button(' Reset ')]]
-    
+
     window = sg.Window('Reset Password', layout)
-    #--------------------------------------------------------------------
-    
+    # --------------------------------------------------------------------
+
+    # Backend Logic
+    # -----------------------------------------------------------------------
     event, values = window.Read()
     if (event == sg.WIN_CLOSED):
         window.close()
@@ -344,7 +372,7 @@ def win_resetpass():
             relpass = pass_encoder(repass)
             data[email] = relpass
             with open('datafile.py', 'w') as fl:
-                json.dump(data,fl)
+                json.dump(data, fl)
             window.close()
             win_confirm()
             win_Login()
@@ -356,26 +384,30 @@ def win_resetpass():
         win_resetpass()
 
 
+# Checking Security Question
 def sec_ques_check():
     with open('datafile.py', 'r') as f:
         dic = json.load(f)
     List = list(dic)
     List.pop(0)
     List.pop(-1)
-    
-    #---------------------------------------------------------------------
+
+    # Interface Layout
+    # -----------------------------------------------------------------------
     layout = [[sg.Text('Please choose any Security question and write it Answer..\n')],
-              [sg.Text('First Question : '), sg.OptionMenu(List, key = 'sq1')],
-              [sg.Text('Enter Answer : '), sg.InputText(key = 'in1')],
-              [sg.Text('Second Question : '), sg.OptionMenu(List, key = 'sq2')],
-              [sg.Text('Enter Answer : '), sg.InputText(key = 'in2')],
-              [sg.Text('Third Question : '), sg.OptionMenu(List, key = 'sq3')],
-              [sg.Text('Enter Answer : '), sg.InputText(key = 'in3')],
+              [sg.Text('First Question : '), sg.OptionMenu(List, key='sq1')],
+              [sg.Text('Enter Answer : '), sg.InputText(key='in1')],
+              [sg.Text('Second Question : '), sg.OptionMenu(List, key='sq2')],
+              [sg.Text('Enter Answer : '), sg.InputText(key='in2')],
+              [sg.Text('Third Question : '), sg.OptionMenu(List, key='sq3')],
+              [sg.Text('Enter Answer : '), sg.InputText(key='in3')],
               [sg.Button(' Submit ')]]
-    
+
     window = sg.Window('Verifying', layout)
-    #---------------------------------------------------------------------
-    
+    # -----------------------------------------------------------------------
+
+    # Backend Logic
+    # -----------------------------------------------------------------------
     event, values = window.Read()
     if (event == sg.WIN_CLOSED):
         window.close()
@@ -415,19 +447,24 @@ def sec_ques_check():
         sec_Ques_Error()
         window.close()
         sec_ques_check()
-        
-        
+
+
+# Forget Username Interface
 def win_Fuser():
     email = get_email()
-    #-------------------------------------------------------------------
+
+    # Interface Layout
+    # -----------------------------------------------------------------------
     layout = [[sg.Text('Your Email is '), sg.Text(email)],
               [sg.Text('Are you Also forget the Password?')],
               [sg.Button(' Recover Account ')],
               [sg.Text('If not, then '), sg.Button(' Log In ')]]
-    
+
     window = sg.Window('Account Recovery', layout)
-    #-------------------------------------------------------------------
-    
+    # -----------------------------------------------------------------------
+
+    # Backend Logic
+    # -----------------------------------------------------------------------
     event, values = window.Read()
     if (event == sg.WIN_CLOSED):
         window.close()
@@ -440,68 +477,75 @@ def win_Fuser():
     else:
         window.close()
         win_Login()
-        
+
 
 # ---------------- Popup Windows --------------------
 
 def win_Error():
     text = 'Password is not Matching.. Please ReEnter it!!'
     sg.Popup(text)
-    
+
+
 def win_Invalid_Input():
     text = 'Incorrect Password or Email!!'
     sg.Popup(text)
-    
+
+
 def win_successful_signup():
     text = 'Signed Up Successfully'
     sg.Popup(text)
+
 
 def sec_Ques_Error():
     text = 'Security Questions Cannot be same!!'
     sg.Popup(text)
 
+
 def win_confirm():
     text = 'Password Changed!!'
     text1 = 'Click OK to Login'
-    sg.Popup(text,text1)
-    
+    sg.Popup(text, text1)
+
 
 def win_Incorrect_Ans():
     text = 'Incorrect Answer!!'
     sg.Popup(text)
-    
+
+
 def win_UserAvailable():
     text = "Can't Sign Up Again. User Already Existed"
     sg.Popup(text)
 
-# ----------------- Back-End-Process -------------------
-        
+
+# ----------------- Back-End-Functions -------------------
+
+# Encoding Password
 def pass_encoder(pss):
     evalue = []
     for char in pss:
         evalue.append(ord(char))
     return evalue
 
-
+# Decoding Password
 def pass_decoder(evalue):
     pss = ''
     for val in evalue:
         pss = pss + chr(val)
     return str(pss)
 
-
+# Verify Function
 def verify():
     code, get_email = otp_process()
     return code, get_email
 
-
-def send_otp(otp,email):
+# Send OTP to register EMail
+def send_otp(otp, email):
     try:
         port = 465
         sender_email = 'safeandsecureyourdata@gmail.com'
         sender_email_pass = 'No@reply2020'
         context = ssl.create_default_context()
-        with smtplib.SMTP_SSL('smtp.gmail.com', port, context = context) as server:
+        with smtplib.SMTP_SSL('smtp.gmail.com', port, context=context) as server:
             server.login(sender_email, sender_email_pass)
             message = ('Your OTP is {}').format(otp)
             server.sendmail(sender_email, email, message)
@@ -510,14 +554,18 @@ def send_otp(otp,email):
         sg.Popup(err)
         win_Login()
 
+
+# Generating OTP
 def otp_process():
-    code = random.randint(111111,999999)
+    code = random.randint(111111, 999999)
     with open('datafile.py') as f:
         data = json.load(f)
     get_email = list(data)[0]
-    send_otp(code,get_email)
+    send_otp(code, get_email)
     return code, get_email
 
+
+# Backup Setup Process
 def win_choice():
     try:
         with open('datafile.py', 'a+') as f:
@@ -532,35 +580,34 @@ def win_choice():
                 win_Login()
             else:
                 second_last_step()
-                last_step(True,email,passd)
+                last_step(True, email, passd)
     except Exception as err:
         print(err)
         win_choice()
 
-
-def last_step(res,*arg):
-    
+# Saving Security Questions
+def last_step(res, *arg):
     l = []
     for a in arg:
         l.append(a)
 
     email = l[0]
     epass = l[1]
-    
+
     if (res == True):
         sec_ques = sec_ques_setup()
-        dic = {email:epass}
+        dic = {email: epass}
         dic.update(sec_ques)
-        dic.update({'sqs':True})
+        dic.update({'sqs': True})
         with open('datafile.py', 'w') as fl:
-            json.dump(dic,fl)
+            json.dump(dic, fl)
         win_successful_signup()
         win_Login()
     elif (res == False):
-        dic = {email:epass}
-        dic.update({'sqs':False})
+        dic = {email: epass}
+        dic.update({'sqs': False})
         with open('datafile.py', 'w') as f:
-            json.dump(dic,f)
+            json.dump(dic, f)
 
 
 def second_last_step():
@@ -570,7 +617,8 @@ def second_last_step():
     email = list(dic.keys())[0]
     passd = list(dic.values())[0]
 
-        
+
+# Check User is available or not
 def file_checker():
     try:
         fsize = os.path.getsize('datafile.py')
@@ -583,11 +631,13 @@ def file_checker():
         sg.Popup(err)
 
 
+# getting email from file
 def get_email():
     with open('datafile.py') as f:
         data = json.load(f)
     email = list(data)[0]
     return email
+
 
 # -------------------------- Main Program -------------------------
 
